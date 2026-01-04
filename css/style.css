@@ -20,11 +20,11 @@
     --bg-input: #ffffff;
     --bg-sidebar: #1e3a5f;
     
-    /* Text Colors */
+    /* Text Colors - FIXED FOR LIGHT THEME */
     --text-dark: #1e293b;
-    --text-primary: #334155;
-    --text-secondary: #64748b;
-    --text-muted: #94a3b8;
+    --text-primary: #1e3a5f;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
     --text-white: #ffffff;
     
     /* Border */
@@ -4193,6 +4193,299 @@ select.form-control {
     grid-template-columns: 1fr 400px;
     gap: 28px;
     margin-bottom: 36px;
+}
+
+/* ============ LIGHT THEME TEXT COLOR FIX ============ */
+/* Override semua text colors untuk light theme */
+
+/* Page Headers */
+.page-title h2,
+.page-header h2,
+h1, h2, h3, h4, h5, h6 {
+    color: #1e3a5f !important;
+}
+
+.page-title p,
+.page-header p {
+    color: #475569 !important;
+}
+
+/* Stat Cards */
+.stat-card .stat-value {
+    color: #1e3a5f !important;
+}
+
+.stat-card .stat-label {
+    color: #2563eb !important;
+}
+
+/* Date Badge */
+.date-badge {
+    color: #1e3a5f !important;
+    background: #ffffff !important;
+    border: 2px solid #3b82f6 !important;
+}
+
+/* Filter Section */
+.filter-group-title {
+    color: #1e3a5f !important;
+}
+
+.month-select {
+    color: #1e3a5f !important;
+}
+
+.filter-tab {
+    color: #1e3a5f !important;
+}
+
+.filter-tab.active {
+    color: #ffffff !important;
+}
+
+/* Section Titles */
+.section-title,
+.card-header .section-title {
+    color: #1e3a5f !important;
+}
+
+/* Legend Items */
+.legend-item {
+    color: #1e3a5f !important;
+}
+
+/* Table */
+.data-table th {
+    color: #2563eb !important;
+}
+
+.data-table td {
+    color: #1e3a5f !important;
+}
+
+.project-name {
+    color: #1e3a5f !important;
+}
+
+.project-client {
+    color: #475569 !important;
+}
+
+.amount {
+    color: #1e3a5f !important;
+}
+
+/* Forms */
+.form-group label {
+    color: #1e3a5f !important;
+}
+
+.form-control {
+    color: #1e3a5f !important;
+}
+
+.form-control::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Info Box */
+.info-box,
+.info-box span {
+    color: #1e3a5f !important;
+}
+
+/* Buttons */
+.btn-secondary {
+    color: #1e3a5f !important;
+}
+
+/* Search Box */
+.search-box input {
+    color: #1e3a5f !important;
+}
+
+.search-box input::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Pagination */
+.pagination-info {
+    color: #475569 !important;
+}
+
+.pagination-info span {
+    color: #1e3a5f !important;
+}
+
+/* Tab Buttons */
+.tab {
+    color: #1e3a5f !important;
+}
+
+.tab.active {
+    color: #ffffff !important;
+}
+
+/* Project Header */
+.project-main h1 {
+    color: #1e3a5f !important;
+}
+
+.meta-item {
+    color: #475569 !important;
+}
+
+.stat-box .value {
+    color: #1e3a5f !important;
+}
+
+.stat-box .label {
+    color: #2563eb !important;
+}
+
+/* Materials Table */
+.materials-table th {
+    color: #2563eb !important;
+}
+
+.materials-table td {
+    color: #1e3a5f !important;
+}
+
+.materials-table input {
+    color: #1e3a5f !important;
+}
+
+/* AC Units Table */
+.ac-units-table th {
+    color: #2563eb !important;
+}
+
+.ac-units-table td {
+    color: #1e3a5f !important;
+}
+
+.ac-units-table input,
+.ac-units-table select {
+    color: #1e3a5f !important;
+}
+
+/* Documents */
+.document-box-title {
+    color: #1e3a5f !important;
+}
+
+.document-box-subtitle {
+    color: #64748b !important;
+}
+
+.document-item-name {
+    color: #1e3a5f !important;
+}
+
+.document-upload-zone p {
+    color: #64748b !important;
+}
+
+/* Upload Zone */
+.upload-zone p {
+    color: #64748b !important;
+}
+
+/* Reports */
+.summary-item-value {
+    color: #1e3a5f !important;
+}
+
+.summary-item-label {
+    color: #475569 !important;
+}
+
+.top-project-name {
+    color: #1e3a5f !important;
+}
+
+.top-project-client {
+    color: #64748b !important;
+}
+
+.monthly-table th {
+    color: #2563eb !important;
+}
+
+.monthly-table td {
+    color: #1e3a5f !important;
+}
+
+/* Popup */
+.popup-info-value {
+    color: #1e3a5f !important;
+}
+
+.popup-info-label {
+    color: #64748b !important;
+}
+
+.popup-address-value {
+    color: #475569 !important;
+}
+
+/* Location Display */
+.location-display p {
+    color: #475569 !important;
+}
+
+.location-display strong {
+    color: #1e3a5f !important;
+}
+
+/* Login Modal */
+.login-modal h2 {
+    color: #1e3a5f !important;
+}
+
+.login-modal > p {
+    color: #475569 !important;
+}
+
+/* Loading */
+.loading-overlay p {
+    color: #1e3a5f !important;
+}
+
+/* Empty State */
+.empty-state h3 {
+    color: #1e3a5f !important;
+}
+
+.empty-state p {
+    color: #475569 !important;
+}
+
+/* Export Buttons */
+.btn-export {
+    color: #1e3a5f !important;
+}
+
+.btn-export.pdf {
+    color: #ef4444 !important;
+}
+
+.btn-export.excel {
+    color: #10b981 !important;
+}
+
+.btn-export.print {
+    color: #3b82f6 !important;
+}
+
+.btn-export:hover {
+    color: #ffffff !important;
+}
+
+/* Map Controls */
+.map-controls input::placeholder {
+    color: #94a3b8 !important;
 }
 
 /* ============ RESPONSIVE ============ */
