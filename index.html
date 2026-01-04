@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NalaBI - Dashboard</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <!-- Leaflet Maps (FREE!) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <div class="logo-icon">
+                        <img src="img/logo.png" alt="Nala Aircon" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <div class="logo-text">
+                        <h1>NalaBI</h1>
+                        <span>Business Intelligence</span>
+                    </div>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main Menu</div>
+                    <a href="index.html" class="nav-item active">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="index.html#projects" class="nav-item" onclick="scrollToProjects()">
+                        <i class="fas fa-folder-open"></i>
+                        <span>All Projects</span>
+                        <span class="nav-badge" id="navProjectCount">0</span>
+                    </a>
+                    <a href="add-project.html" class="nav-item">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>New Project</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Analytics</div>
+                    <a href="reports.html" class="nav-item">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </a>
+                    <a href="index.html#map" class="nav-item" onclick="scrollToMap()">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Map View</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#" class="nav-item" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search projects, clients...">
+                </div>
+                <div class="top-actions">
+                    <button class="btn btn-primary" onclick="window.location.href='add-project.html'">
+                        <i class="fas fa-plus"></i> New Project
+                    </button>
+                    <div class="user-avatar" id="userAvatar">
+                        <span>NA</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="page-title">
+                        <h2>Dashboard</h2>
+                        <p>Welcome back! Here's your project overview.</p>
+                    </div>
+                    <div class="date-badge">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+                
+                <!-- Stats Grid -->
+                <div class="stats-grid" id="statsSection">
+                    <div class="stat-card blue animate-fadeInUp animate-delay-1">
+                        <div class="stat-icon"><i class="fas fa-folder-open"></i></div>
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-label">Total Projects</div>
+                    </div>
+                    <div class="stat-card green animate-fadeInUp animate-delay-2">
+                        <div class="stat-icon"><i class="fas fa-hard-hat"></i></div>
+                        <div class="stat-value" id="statActive">0</div>
+                        <div class="stat-label">On Progress</div>
+                    </div>
+                    <div class="stat-card purple animate-fadeInUp animate-delay-3">
+                        <div class="stat-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <div class="stat-value" id="statRevenue">Rp 0</div>
+                        <div class="stat-label">Total Quotation</div>
+                    </div>
+                    <div class="stat-card cyan animate-fadeInUp animate-delay-4">
+                        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="stat-value" id="statProfit">Rp 0</div>
+                        <div class="stat-label" id="statProfitLabel">Total Profit</div>
+                    </div>
+                </div>
+                
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <div class="filter-group-title">
+                                <i class="fas fa-calendar-alt"></i> Filter Bulan:
+                            </div>
+                            <select class="month-select" id="monthFilter">
+                                <option value="all">📅 Semua Waktu</option>
+                                <option value="0">Januari</option>
+                                <option value="1">Februari</option>
+                                <option value="2">Maret</option>
+                                <option value="3">April</option>
+                                <option value="4">Mei</option>
+                                <option value="5">Juni</option>
+                                <option value="6">Juli</option>
+                                <option value="7">Agustus</option>
+                                <option value="8">September</option>
+                                <option value="9">Oktober</option>
+                                <option value="10">November</option>
+                                <option value="11">Desember</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <div class="filter-group-title">
+                                <i class="fas fa-filter"></i> Filter Status:
+                            </div>
+                            <div class="filter-tabs">
+                                <button class="filter-tab active" data-filter="all">
+                                    <i class="fas fa-layer-group"></i> All
+                                    <span class="count" id="countAll">0</span>
+                                </button>
+                                <button class="filter-tab" data-filter="prospek">
+                                    <i class="fas fa-lightbulb"></i> Prospek
+                                    <span class="count" id="countProspek">0</span>
+                                </button>
+                                <button class="filter-tab" data-filter="survey">
+                                    <i class="fas fa-clipboard-list"></i> Survey
+                                    <span class="count" id="countSurvey">0</span>
+                                </button>
+                                <button class="filter-tab" data-filter="pengerjaan">
+                                    <i class="fas fa-tools"></i> Progress
+                                    <span class="count" id="countPengerjaan">0</span>
+                                </button>
+                                <button class="filter-tab" data-filter="ditolak">
+                                    <i class="fas fa-times-circle"></i> Rejected
+                                    <span class="count" id="countDitolak">0</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Grid (Map + Charts) -->
+                <div class="main-grid">
+                    <!-- Map Section -->
+                    <div class="map-section" id="mapSection">
+                        <div class="card-header">
+                            <div class="section-title">
+                                <i class="fas fa-map-marked-alt"></i>
+                                Project Locations
+                            </div>
+                            <div class="map-legend">
+                                <div class="legend-item"><div class="legend-dot prospek"></div><span>Prospek</span></div>
+                                <div class="legend-item"><div class="legend-dot survey"></div><span>Survey</span></div>
+                                <div class="legend-item"><div class="legend-dot pengerjaan"></div><span>Progress</span></div>
+                                <div class="legend-item"><div class="legend-dot ditolak"></div><span>Rejected</span></div>
+                            </div>
+                        </div>
+                        <div id="dashboardMap"></div>
+                    </div>
+                    
+                    <!-- Charts Section -->
+                    <div class="charts-section">
+                        <div class="chart-card">
+                            <div class="section-title">
+                                <i class="fas fa-chart-pie"></i>
+                                Status Overview
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="section-title">
+                                <i class="fas fa-chart-bar"></i>
+                                Source Distribution
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="sourceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Projects Section -->
+                <div class="card" id="projectsSection">
+                    <div class="card-header">
+                        <div class="section-title">
+                            <i class="fas fa-list-alt"></i>
+                            All Projects
+                        </div>
+                    </div>
+                    
+                    <div id="loadingState" class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <h3>Loading projects...</h3>
+                    </div>
+                    
+                    <div id="emptyState" class="empty-state" style="display: none;">
+                        <i class="fas fa-folder-open"></i>
+                        <h3>No Projects Found</h3>
+                        <p>Create your first project or adjust filters</p>
+                    </div>
+                    
+                    <table class="data-table" id="projectsTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>Project</th>
+                                <th>Status</th>
+                                <th>Source</th>
+                                <th>Quotation</th>
+                                <th>Profit/Loss</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectsTableBody"></tbody>
+                    </table>
+                    
+                    <div class="pagination" id="pagination" style="display: none;">
+                        <div class="pagination-info">
+                            Showing <span id="showingStart">1</span>-<span id="showingEnd">10</span> of <span id="totalItems">0</span> projects
+                        </div>
+                        <div class="pagination-buttons" id="paginationButtons"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Project Popup -->
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="project-popup" id="projectPopup">
+        <div class="popup-header">
+            <button class="popup-close" onclick="closeProjectPopup()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="popup-status" id="popupStatus">Status</div>
+            <h3 class="popup-title" id="popupTitle">Project Name</h3>
+            <div class="popup-client">
+                <i class="fas fa-building"></i>
+                <span id="popupClient">Client</span>
+            </div>
+        </div>
+        <div class="popup-body">
+            <div class="popup-info-grid">
+                <div class="popup-info-item">
+                    <div class="popup-info-label">Quotation</div>
+                    <div class="popup-info-value" id="popupQuotation">Rp 0</div>
+                </div>
+                <div class="popup-info-item">
+                    <div class="popup-info-label" id="popupPLLabel">Profit</div>
+                    <div class="popup-info-value" id="popupProfitLoss">Rp 0</div>
+                </div>
+            </div>
+            <div class="popup-address">
+                <div class="popup-address-label">
+                    <i class="fas fa-map-marker-alt"></i> Alamat
+                </div>
+                <div class="popup-address-value" id="popupAddress">-</div>
+            </div>
+            <div class="popup-actions">
+                <button class="popup-btn popup-btn-secondary" onclick="closeProjectPopup()">
+                    <i class="fas fa-times"></i> Tutup
+                </button>
+                <button class="popup-btn popup-btn-primary" id="popupViewBtn">
+                    <i class="fas fa-eye"></i> Lihat Detail
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-modal">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-snowflake"></i></div>
+                <div class="logo-text">
+                    <h1>NalaBI</h1>
+                    <span>Business Intelligence</span>
+                </div>
+            </div>
+            <h2>Welcome Back!</h2>
+            <p>Login to access your dashboard</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" class="form-control" id="loginEmail" placeholder="admin@nalaaircon.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <div class="login-error" id="loginError"></div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

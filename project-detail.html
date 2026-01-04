@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Project - NalaBI</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <!-- Leaflet Maps (FREE!) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- jsPDF for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        #map { height: 300px; }
+        .chart-container { height: 320px; }
+        .source-badge-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-left: 14px;
+            background: rgba(189, 232, 245, 0.15);
+            color: var(--primary-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <div class="logo-icon">
+                        <img src="img/logo.png" alt="Nala Aircon" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <div class="logo-text">
+                        <h1>NalaBI</h1>
+                        <span>Business Intelligence</span>
+                    </div>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main Menu</div>
+                    <a href="index.html" class="nav-item">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="index.html" class="nav-item active">
+                        <i class="fas fa-folder-open"></i>
+                        <span>All Projects</span>
+                    </a>
+                    <a href="add-project.html" class="nav-item">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>New Project</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Analytics</div>
+                    <a href="reports.html" class="nav-item">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#" class="nav-item" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="page-title">
+                    <h2 class="page-title-with-icon">
+                        <i class="fas fa-folder-open"></i>
+                        <span id="pageTitle">Detail Project</span>
+                    </h2>
+                </div>
+                <div class="top-actions">
+                    <div class="export-buttons">
+                        <button class="btn-export pdf" onclick="exportPDF()">
+                            <i class="fas fa-file-pdf"></i> Export PDF
+                        </button>
+                        <button class="btn-export print" onclick="printProject()">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                    <button class="btn btn-secondary" onclick="window.location.href='index.html'">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
+                    <button class="btn btn-primary" onclick="saveProject()">
+                        <i class="fas fa-save"></i> Simpan
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteProject()">
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Project Header -->
+                <div class="project-header">
+                    <div class="project-main">
+                        <h1 id="projectTitle">Loading...</h1>
+                        <div>
+                            <span class="status-badge" id="statusBadge">-</span>
+                            <span class="source-badge-inline" id="sourceBadge">-</span>
+                        </div>
+                        <div class="project-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-building"></i>
+                                <span id="clientInfo">-</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-phone"></i>
+                                <span id="phoneInfo">-</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span id="dateInfo">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-stats">
+                        <div class="stat-box">
+                            <div class="value" id="statQuotation">Rp 0</div>
+                            <div class="label">Total Penawaran</div>
+                        </div>
+                        <div class="stat-box" id="plCard">
+                            <div class="value" id="statPL">Rp 0</div>
+                            <div class="label" id="plLabel">Profit/Loss</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab active" data-tab="info">
+                        <i class="fas fa-info-circle"></i> Info
+                    </button>
+                    <button class="tab" data-tab="acunits">
+                        <i class="fas fa-wind"></i> AC Units
+                    </button>
+                    <button class="tab" data-tab="materials">
+                        <i class="fas fa-boxes"></i> Materials
+                    </button>
+                    <button class="tab" data-tab="documents">
+                        <i class="fas fa-file-alt"></i> Documents
+                    </button>
+                    <button class="tab" data-tab="photos">
+                        <i class="fas fa-images"></i> Photos
+                    </button>
+                    <button class="tab" data-tab="chart">
+                        <i class="fas fa-chart-bar"></i> Chart
+                    </button>
+                </div>
+                
+                <!-- Tab: Info -->
+                <div class="tab-content active" id="tab-info">
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Informasi Project
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nama Project</label>
+                                <input type="text" class="form-control" id="editName">
+                            </div>
+                            <div class="form-group">
+                                <label>Nama Client</label>
+                                <input type="text" class="form-control" id="editClient">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>No. Telepon</label>
+                                <input type="tel" class="form-control" id="editPhone">
+                            </div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select class="form-control" id="editStatus">
+                                    <option value="prospek">Prospek</option>
+                                    <option value="survey">Survey</option>
+                                    <option value="pengerjaan">Pengerjaan</option>
+                                    <option value="selesai">Selesai</option>
+                                    <option value="ditolak">Ditolak</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Deskripsi</label>
+                            <textarea class="form-control" id="editDesc" rows="3"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Lokasi
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Alamat</label>
+                            <input type="text" class="form-control" id="editAddress" disabled>
+                        </div>
+                        
+                        <div class="map-container" id="map"></div>
+                    </div>
+                </div>
+                
+                <!-- Tab: AC Units -->
+                <div class="tab-content" id="tab-acunits">
+                    <div class="form-section">
+                        <div class="ac-units-header">
+                            <div class="section-title">
+                                <i class="fas fa-wind"></i>
+                                Unit AC
+                            </div>
+                            <button class="btn-add-row" onclick="addACUnit()">
+                                <i class="fas fa-plus"></i> Tambah Unit AC
+                            </button>
+                        </div>
+                        
+                        <div style="overflow-x: auto;">
+                            <table class="ac-units-table" id="acUnitsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Merk/Model</th>
+                                        <th>PK</th>
+                                        <th>Tipe</th>
+                                        <th>Qty</th>
+                                        <th>Harga Satuan</th>
+                                        <th>Total</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="acUnitsBody"></tbody>
+                                <tfoot>
+                                    <tr style="background: var(--bg-card-hover);">
+                                        <td colspan="5" style="text-align: right; font-weight: 700;">Total Unit AC:</td>
+                                        <td colspan="2" style="font-weight: 800; color: var(--primary-light);" id="acUnitsTotal">Rp 0</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tab: Materials -->
+                <div class="tab-content" id="tab-materials">
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-boxes"></i>
+                            Materials & Services
+                        </div>
+                        
+                        <div style="overflow-x: auto;">
+                            <table class="materials-table" id="materialsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Unit</th>
+                                        <th>Qty Penawaran</th>
+                                        <th>Harga Penawaran</th>
+                                        <th>Qty Real</th>
+                                        <th>Harga Real</th>
+                                        <th>P/L</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="materialsBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tab: Documents -->
+                <div class="tab-content" id="tab-documents">
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-file-alt"></i>
+                            Dokumen Project
+                        </div>
+                        
+                        <div class="documents-grid">
+                            <!-- Penawaran -->
+                            <div class="document-box">
+                                <div class="document-box-header">
+                                    <div class="document-box-icon penawaran">
+                                        <i class="fas fa-file-invoice"></i>
+                                    </div>
+                                    <div>
+                                        <div class="document-box-title">Penawaran</div>
+                                        <div class="document-box-subtitle">Surat penawaran harga</div>
+                                    </div>
+                                </div>
+                                <div class="document-list" id="penawaranList"></div>
+                                <div class="document-upload-zone" onclick="triggerUpload('penawaran')">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Klik untuk upload penawaran</p>
+                                </div>
+                                <input type="file" id="uploadPenawaran" accept=".pdf,.doc,.docx,.jpg,.png" style="display:none" onchange="uploadDocument('penawaran', this)">
+                            </div>
+                            
+                            <!-- BAST -->
+                            <div class="document-box">
+                                <div class="document-box-header">
+                                    <div class="document-box-icon bast">
+                                        <i class="fas fa-file-signature"></i>
+                                    </div>
+                                    <div>
+                                        <div class="document-box-title">BAST</div>
+                                        <div class="document-box-subtitle">Berita Acara Serah Terima</div>
+                                    </div>
+                                </div>
+                                <div class="document-list" id="bastList"></div>
+                                <div class="document-upload-zone" onclick="triggerUpload('bast')">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Klik untuk upload BAST</p>
+                                </div>
+                                <input type="file" id="uploadBast" accept=".pdf,.doc,.docx,.jpg,.png" style="display:none" onchange="uploadDocument('bast', this)">
+                            </div>
+                            
+                            <!-- Invoice -->
+                            <div class="document-box">
+                                <div class="document-box-header">
+                                    <div class="document-box-icon invoice">
+                                        <i class="fas fa-file-invoice-dollar"></i>
+                                    </div>
+                                    <div>
+                                        <div class="document-box-title">Invoice</div>
+                                        <div class="document-box-subtitle">Faktur tagihan</div>
+                                    </div>
+                                </div>
+                                <div class="document-list" id="invoiceList"></div>
+                                <div class="document-upload-zone" onclick="triggerUpload('invoice')">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Klik untuk upload invoice</p>
+                                </div>
+                                <input type="file" id="uploadInvoice" accept=".pdf,.doc,.docx,.jpg,.png" style="display:none" onchange="uploadDocument('invoice', this)">
+                            </div>
+                            
+                            <!-- Gallery -->
+                            <div class="document-box">
+                                <div class="document-box-header">
+                                    <div class="document-box-icon gallery">
+                                        <i class="fas fa-images"></i>
+                                    </div>
+                                    <div>
+                                        <div class="document-box-title">Gallery</div>
+                                        <div class="document-box-subtitle">Foto dokumentasi lainnya</div>
+                                    </div>
+                                </div>
+                                <div class="document-list" id="galleryList"></div>
+                                <div class="document-upload-zone" onclick="triggerUpload('gallery')">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Klik untuk upload gambar</p>
+                                </div>
+                                <input type="file" id="uploadGallery" accept="image/*" multiple style="display:none" onchange="uploadDocument('gallery', this)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tab: Photos -->
+                <div class="tab-content" id="tab-photos">
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-images"></i>
+                            Foto Project (Survey)
+                        </div>
+                        
+                        <div class="photos-grid" id="photosGrid"></div>
+                        
+                        <div class="upload-zone" id="uploadZone">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Klik atau drag foto ke sini untuk upload</p>
+                            <input type="file" id="photoInput" accept="image/*" multiple style="display: none;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tab: Chart -->
+                <div class="tab-content" id="tab-chart">
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Analisis Profit/Loss
+                        </div>
+                        
+                        <div class="chart-container">
+                            <canvas id="plChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p id="loadingText">Loading...</p>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/project-detail.js"></script>
+</body>
+</html>
