@@ -4198,10 +4198,44 @@ select.form-control {
 /* ============ LIGHT THEME TEXT COLOR FIX ============ */
 /* Override semua text colors untuk light theme */
 
+/* Sidebar - Keep White Text */
+.logo-text h1 {
+    color: #ffffff !important;
+}
+
+.logo-text span {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.nav-item {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    color: #ffffff !important;
+}
+
+.nav-section-title {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.nav-badge {
+    color: #ffffff !important;
+}
+
 /* Page Headers */
 .page-title h2,
-.page-header h2,
-h1, h2, h3, h4, h5, h6 {
+.page-header h2 {
+    color: #1e3a5f !important;
+}
+
+.main-content h1,
+.main-content h2,
+.main-content h3,
+.main-content h4,
+.main-content h5,
+.main-content h6 {
     color: #1e3a5f !important;
 }
 
